@@ -4,7 +4,7 @@ const path = require('path')
 const shortid = require('shortid')
 const session = require('express-session')
 const app = express()
-const { Todos } = require('./db/mongoose.js')
+const { Todo, User } = require('./db/mongoose.js')
 
 const {
 	PORT = 5000,
@@ -38,8 +38,8 @@ app.use(
 // LOGS
 const util = require('util')
 app.use((req, res, next) => {
-	console.log('shortId: ', shortid.generate())
-	console.log('secret: ', req.session.secret)
+	// console.log('shortId: ', shortid.generate())
+	// console.log('secret: ', req.session.secret)
 	fs.appendFile(
 		'./logFile.log',
 		// JSON.stringify(req.session, null, 2),
@@ -52,11 +52,25 @@ app.use((req, res, next) => {
 })
 
 const loggedIn = (req, res, next) => {
-	if (req.session.email === 'j' && req.session.password === 'j') {
-		next()
-	} else {
-		res.status(401).redirect('/home')
-	}
+	// if (req.session.email === 'j' && req.session.password === 'j') {
+	// 	next()
+	// } else {
+	// 	res.status(401).redirect('/home')
+	// }
+
+	User.findOne(
+		{ email: req.session.email, password: req.session.password },
+		(err, user) => {
+			if (err) {
+				return res.status(500).redirect('login')
+			}
+			if (!user) {
+				return res.status(404).redirect('login')
+			}
+			next()
+			// return res.status(200).send('welcome,', user)
+		}
+	)
 }
 
 app.get('/home', (req, res) => {
@@ -76,6 +90,32 @@ app.post('/login', (req, res, next) => {
 	res.redirect('/')
 })
 
+// POST ROUTE
+app.get('/register', (req, res) => {
+	res.render('register', {
+		name: t
+	})
+})
+
+app.post('/register', (req, res, next) => {
+	req.session.email = req.body.email
+	req.session.password = req.body.password
+
+	const u2 = new User({
+		email: req.session.email,
+		password: req.session.password
+	})
+
+	// localStorage.setItem('k', 'cat')
+	// localStorage.getItem('k')
+
+	console.log('from register!')
+
+	u2.save().then(t => console.log('user saved!'))
+
+	res.redirect('/')
+})
+
 app.get('/', loggedIn, (req, res) => {
 	res.redirect('home')
 })
@@ -90,7 +130,7 @@ app.get('/logout', (req, res) => {
 		if (e) {
 			res.negotiate(e)
 		}
-		console.log('secret: ', req.session)
+		// console.log('secret: ', req.session)
 		res.redirect('/')
 	})
 })
@@ -106,7 +146,7 @@ app.get('/addTodo', loggedIn, (req, res) => {
 
 app.post('/addTodo', (req, res) => {
 	t = [...t, req.body.name]
-	console.log(t)
+	// console.log(t)
 	res.redirect('addTodo')
 })
 
