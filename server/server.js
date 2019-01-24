@@ -1,13 +1,16 @@
 const express = require('express')
 const fs = require('fs')
-// const bodyParser = require('body-parser')
 const path = require('path')
 const shortid = require('shortid')
 const session = require('express-session')
 const app = express()
 const { Todos } = require('./db/mongoose.js')
 
-const { port = 5000, TWO_HOURS = 2 * 3600000 } = process.env
+const {
+	PORT = 5000,
+	TWO_HOURS = 2 * 3600000,
+	NODE_ENV = 'developement'
+} = process.env
 
 app.set('view engine', 'pug')
 
@@ -20,11 +23,14 @@ app.use(express.static(path.join(__dirname, '..', '/public')))
 // register session with it's secret ID
 app.use(
 	session({
+		name: 'kid',
 		secret: 'Jamal',
 		resave: false,
 		saveUninitialized: false,
 		cookie: {
-			maxAge: TWO_HOURS
+			httpOnly: true,
+			maxAge: TWO_HOURS,
+			secure: process.env.NODE_ENV === 'production'
 		}
 	})
 )
@@ -45,6 +51,18 @@ app.use((req, res, next) => {
 	next()
 })
 
+const loggedIn = (req, res, next) => {
+	if (req.session.email === 'j' && req.session.password === 'j') {
+		next()
+	} else {
+		res.status(401).redirect('/home')
+	}
+}
+
+app.get('/home', (req, res) => {
+	res.render('home')
+})
+
 // LOGIN ROUTE
 app.get('/login', (req, res) => {
 	res.render('login', {
@@ -55,22 +73,12 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res, next) => {
 	req.session.email = req.body.email
 	req.session.password = req.body.password
-	// res.end(
-	// 	`Done, your email is : ${req.session.email} & your pass is: ${
-	// 		req.session.password
-	// 	}`
-	// )
 	res.redirect('/')
 })
 
-app.get('/', (req, res) => {
-	if (req.session.email === 'j' && req.session.password === 'j') {
-		res.redirect('logged')
-	} else {
-		res.redirect('login')
-	}
+app.get('/', loggedIn, (req, res) => {
+	res.redirect('home')
 })
-
 // LOGGED ROUTE
 app.get('/logged', (req, res) => {
 	res.redirect('addTodo')
@@ -90,21 +98,20 @@ app.get('/logout', (req, res) => {
 let t = []
 
 // YOUR APP
-app.get('/addTodo', (req, res) => {
-	if (req.session.email === 'j' && req.session.password === 'j') {
-		res.render('addTodo', {
-			name: t
-		})
-	} else {
-		res.redirect('/')
-	}
+app.get('/addTodo', loggedIn, (req, res) => {
+	res.render('addTodo', {
+		name: t
+	})
 })
 
 app.post('/addTodo', (req, res) => {
-	// console.log(req.body.name)
 	t = [...t, req.body.name]
 	console.log(t)
 	res.redirect('addTodo')
 })
 
-app.listen(port, () => console.log(`lestning on port ${port}`))
+app.get('/dashboard', loggedIn, (req, res) => {
+	res.status(200).send('Welcome to your top-secret dashboard!')
+})
+
+app.listen(PORT, () => console.log(`http://localhost:${PORT}`))

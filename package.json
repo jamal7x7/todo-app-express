@@ -11,7 +11,6 @@
   "author": "Jamal <jamal7x7@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "mongodb": "^3.1.12",
