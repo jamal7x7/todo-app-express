@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible", content="ie=edge")
+        title Document
+    body
+        style(type='text/css').
+            body {
+                background-color: #555999;
+                color: #fff
+            }
+            input {
+                
+                height: 40px;
+                width: 60%;
+                background-color: #576999; 
+                color: yellow;
+                 border-color: #ffffff00;
+            }
+            button {
+                height: 40px;
+                background-color: #444999; 
+                color: yellow;
+                border-color: #ffffff00;
+            }
+        
+        h1 Add Todo Page
+        a(href="/login") LOGIN
+        a(href="/logout") LOGOUT
+
+        form(action="/addTodo" method="POST")
+            input(type="text", name="name")
+            button(type="submit") ADD TODO
+        
+        h2 #{name}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible", content="ie=edge")
+        title Login
+    body
+        style(type='text/css').
+            body {
+                background-color: #555999;
+                text-align: center;
+                color: #fff;
+                
+            }
+            input {
+                margin-top: 40px;
+                padding-left: 20px;
+                font-size: 16px;
+                height: 40px;
+                width: 20%;
+                background-color: #57699999; 
+                color: yellow;
+                 border-color: #ffffff00;
+                 outline: none;
+            }
+            button {
+                font-size: 16px;
+                height: 40px;
+                width: 80px;
+                background-color: #444999; 
+                color: yellow;
+                border-color: #ffffff00;
+            }
+            .password {
+                background-color: #576999;
+
+            }
+        
+        h1 Login  
+        h2 Enter your Password
+        a(href="/login") LOGIN
+        a(href="/logout") LOGOUT
+
+        form(action="login" method="POST")
+            input(type="text", name="email" placeholder="email")
+            input(class="password" type="password", name="password" placeholder="password")
+            button(type="submit") Login
+        
